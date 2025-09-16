@@ -1,2 +1,4 @@
 # agatark-test
-Agatark proovitöö
+Agatark proovitöö - Hans Oskar Trolla
+
+LiteJS'iga tehtud lihtne SPA (Single Page Application)
