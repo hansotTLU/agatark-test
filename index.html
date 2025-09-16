@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<title>LiteJS routed view example</title>
+<meta name="viewport" content="initial-scale=1,maximum-scale=1">
+<link rel="icon" href="data:image/x-icon;,">
+<link rel="stylesheet" href="styles.css">
+</head><body>
+<script type="ui">
+
+// An internal view `#pub` without a route can used as a parent for other views,
+// put inside $ui root element (document.body by default)
+%view #pub #
+  h1 Agatark test
+  hr
+  nav
+    a[href="#"] Home
+    a[href="#smarthome"] Smarthome
+    a[href="#minust"] Minust
+  hr
+  %slot
+  footer
+    hr
+    p.text-sm Hans Oskar Trolla
+
+
+// Public view `home` uses `#pub` as it's parent
+%view home #pub
+main
+  h2 Avaleht
+  p See on lihtne SPA (Single Page Application), mis on loodud LiteJS'iga.
+  p Siit leiad lihtsa demo Smarthome juhtpaneeli ja infot minu kohta.
+
+
+%view smarthome #pub
+main
+  h2 Targa kodu lihtne demo juhtpaneel
+  dl.control.panel
+    dt Uksed
+    button:b AVA
+    button:b SULE
+    dt Tuled
+    button:b SISSE
+    button:b VÄLJA
+    dt Temperatuur
+    button:b -
+    button:b +
+
+
+%view minust #pub
+;f "contacts.json"
+main
+  h2 Minust
+  p Olen Hans Oskar Trolla ja õpin Tallinna Ülikoolis informaatikat. Selle kõrvalt tegelen vahel ka lavade ja lavatehnika ülespanekuga.
+  p Mind huvitavad arvutid, tehnika üldiselt ja nende ülespanemine ning seadistamine.
+  p Soovin praktikakohta, et arendada oma oskusi ja saada kogemust reaalses ITga tegelevas firmas.
+  p Minu kontaktid (JSON failist):
+  ul.contact
+    li ;each!"row",contacts
+      a ;txt row.title;href!row.link
+
+
+%view blog/{blogFile} #pub
+main
+	article ;d!blogFile
+
+
+%js
+  // All loaded *.json files will be handled by this function
+  xhr.json = function(str, url) {
+    // $d is root data object
+    $d[url.split(".")[0]] = JSON.parse(str)
+  }
+  var blogCache = {}
+  // Handle named route parameter.
+  $ui.param("blogFile", function(value, name, view, params) {
+    if (blogCache[value]) return $d[name] = blogCache[value]
+    var cb = view.wait()
+    xhr("GET", value + ".text", function(err, body) {
+      $d[name] = blogCache[value] = body || "Error"
+      cb()
+    }).send()
+  })
+
+
+%start
+</script>
+<script src="https://litejs.com/litejs.full.min.js"></script>
+<noscript>This application requires JavaScript</noscript>
+</body></html>
